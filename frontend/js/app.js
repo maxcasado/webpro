@@ -241,36 +241,9 @@ const App = {
                         <h2 class="mb-20">Catalogue de Livres</h2>
                         <div class="books-actions">
                             ${isAdmin ? '<button class="btn" id="add-book-btn">Ajouter un livre</button>' : ''}
-                            <button class="btn" id="search-books-btn">Recherche avancée</button>
                         </div>
                     </div>
-                    
-                    <div class="search-section" id="search-section" style="display: none;">
-                        <div class="search-form">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <input type="text" id="search-query" placeholder="Rechercher par titre, auteur, ISBN..." class="form-control">
-                                </div>
-                                <div class="form-group">
-                                    <input type="text" id="search-author" placeholder="Auteur" class="form-control">
-                                </div>
-                                <div class="form-group">
-                                    <select id="search-category" class="form-control">
-                                        <option value="">Toutes les catégories</option>
-                                        ${categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('')}
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <input type="number" id="search-year" placeholder="Année" class="form-control">
-                                </div>
-                                <div class="form-group">
-                                    <button class="btn" id="perform-search-btn">Rechercher</button>
-                                    <button class="btn" id="clear-search-btn">Effacer</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
+                    <input type="text" id="unified-search-input" placeholder="Rechercher un livre, auteur, année ou catégorie..." class="form-control" style="max-width: 600px; margin-bottom: 20px;">
                     <div class="card-container" id="books-container">
             `;
 
@@ -284,16 +257,40 @@ const App = {
 
             html += `</div></div>`;
 
+            // Injecter le HTML
             UI.setContent(html);
-            
-            // Setup event listeners
+
+            // Ajouter l'écouteur de recherche
+            const searchInput = document.getElementById('unified-search-input');
+            if (searchInput) {
+                searchInput.addEventListener('input', async (e) => {
+                    const query = e.target.value.trim().toLowerCase();
+                    const allBooks = await Api.getBooks();
+                    const filtered = allBooks.filter(book => {
+                        return (
+                            (book.title && book.title.toLowerCase().includes(query)) ||
+                            (book.author && book.author.toLowerCase().includes(query)) ||
+                            (book.isbn && book.isbn.toLowerCase().includes(query)) ||
+                            (book.publication_year && book.publication_year.toString().includes(query)) ||
+                            (book.publisher && book.publisher.toLowerCase().includes(query)) ||
+                            (book.language && book.language.toLowerCase().includes(query)) ||
+                            (book.pages && book.pages.toString().includes(query))
+                        );
+                    });
+                    this.displaySearchResults(filtered, isAdmin);
+                });
+            }
+
+
+            // Ajout des autres listeners si besoin
             this.setupBooksEventListeners(isAdmin);
-            
+
         } catch (error) {
             console.error('Erreur lors du chargement des livres:', error);
             UI.setContent(`<p>Erreur lors du chargement des livres. Veuillez réessayer.</p>`);
         }
     },
+
 
     // Create a book card HTML
     createBookCard: function(book, isAdmin = false) {
@@ -380,7 +377,7 @@ const App = {
             
             const searchBtn = document.getElementById('search-books-btn');
             if (searchBtn) {
-                searchBtn.textContent = isVisible ? 'Recherche avancée' : 'Masquer recherche';
+                searchBtn.textContent = isVisible ? 'Recherche' : 'Masquer recherche';
             }
         }
     },
@@ -787,61 +784,7 @@ const App = {
                     </div>
             `;
 
-            // Add loan statistics section for regular users
-            if (!user.is_admin && loanStats) {
-                html += `
-                    <div class="profile-loans-section">
-                        <h3>Mes Emprunts</h3>
-                        <div class="loans-stats mb-20">
-                            <div class="stat-card">
-                                <h4>Total</h4>
-                                <p class="stat-number">${loanStats.total}</p>
-                            </div>
-                            <div class="stat-card">
-                                <h4>Actifs</h4>
-                                <p class="stat-number">${loanStats.active}</p>
-                            </div>
-                            <div class="stat-card">
-                                <h4>En Retard</h4>
-                                <p class="stat-number ${loanStats.overdue > 0 ? 'stat-warning' : ''}">${loanStats.overdue}</p>
-                            </div>
-                            <div class="stat-card">
-                                <h4>Retournés</h4>
-                                <p class="stat-number">${loanStats.returned}</p>
-                            </div>
-                        </div>
-                        
-                        ${loanStats.recentLoans.length > 0 ? `
-                            <div class="recent-loans">
-                                <h4>Emprunts Récents</h4>
-                                ${loanStats.recentLoans.map(loan => {
-                                    const isOverdue = loan.due_date && new Date(loan.due_date) < new Date() && !loan.return_date;
-                                    const isActive = !loan.return_date;
-                                    const statusClass = isOverdue ? 'overdue' : isActive ? 'active' : 'returned';
-                                    const statusText = isOverdue ? 'En retard' : isActive ? 'Actif' : 'Retourné';
-                                    
-                                    return `
-                                        <div class="recent-loan-item">
-                                            <div class="loan-book-info">
-                                                <strong>${loan.book?.title || 'N/A'}</strong>
-                                                <span class="loan-author">${loan.book?.author || 'N/A'}</span>
-                                            </div>
-                                            <div class="loan-status-info">
-                                                <span class="status ${statusClass}">${statusText}</span>
-                                                <span class="loan-date">${new Date(loan.loan_date).toLocaleDateString()}</span>
-                                            </div>
-                                        </div>
-                                    `;
-                                }).join('')}
-                            </div>
-                        ` : ''}
-                        
-                        <div class="profile-loans-actions">
-                            <button class="btn" onclick="App.loadPage('my-loans')">Voir tous mes emprunts</button>
-                        </div>
-                    </div>
-                `;
-            }
+        
 
             html += `
                     <button class="btn" id="edit-profile-btn">Modifier le profil</button>
