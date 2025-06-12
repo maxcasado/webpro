@@ -1,0 +1,1160 @@
+/* Variables et réinitialisation */
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #2980b9;
+    --accent-color: #e74c3c;
+    --text-color: #333;
+    --light-color: #f4f4f4;
+    --dark-color: #333;
+    --success-color: #2ecc71;
+    --warning-color: #f39c12;
+    --error-color: #e74c3c;
+    --border-radius: 4px;
+    --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: #f9f9f9;
+}
+
+/* Layout */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    background-color: white;
+    padding: 20px 0;
+    box-shadow: var(--box-shadow);
+    margin-bottom: 30px;
+}
+
+header h1 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+nav ul {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+}
+
+nav ul li {
+    margin: 0 10px;
+}
+
+nav ul li a {
+    color: var(--text-color);
+    text-decoration: none;
+    padding: 8px 15px;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+}
+
+nav ul li a:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+main {
+    flex: 1;
+    padding: 20px;
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    margin-bottom: 30px;
+    position: relative;
+}
+
+footer {
+    text-align: center;
+    padding: 20px 0;
+    color: #777;
+    font-size: 0.9rem;
+}
+
+/* Formulaires */
+.form-container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.btn {
+    display: inline-block;
+    background-color: var(--primary-color);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+.btn:hover {
+    background-color: var(--secondary-color);
+}
+
+.btn-block {
+    display: block;
+    width: 100%;
+}
+
+/* Messages */
+#message-container {
+    margin-bottom: 20px;
+}
+
+#message {
+    padding: 10px 15px;
+    border-radius: var(--border-radius);
+}
+
+.success {
+    background-color: rgba(46, 204, 113, 0.2);
+    border: 1px solid var(--success-color);
+    color: #27ae60;
+}
+
+.error {
+    background-color: rgba(231, 76, 60, 0.2);
+    border: 1px solid var(--error-color);
+    color: #c0392b;
+}
+
+.warning {
+    background-color: rgba(243, 156, 18, 0.2);
+    border: 1px solid var(--warning-color);
+    color: #d35400;
+}
+
+/* Utilitaires */
+.hidden {
+    display: none !important;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mt-20 {
+    margin-top: 20px;
+}
+
+.mb-20 {
+    margin-bottom: 20px;
+}
+
+/* Spinner de chargement */
+.spinner {
+    width: 40px;
+    height: 40px;
+    margin: 20px auto;
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-top: 4px solid var(--primary-color);
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+/* Cartes pour les livres */
+.card-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.card {
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 15px;
+}
+
+.card-body {
+    padding: 15px;
+}
+
+.card-footer {
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-top: 1px solid #ddd;
+}
+
+/* Profil utilisateur */
+.profile-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.profile-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.profile-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    margin: 0 auto 15px;
+}
+
+.profile-info {
+    margin-bottom: 30px;
+}
+
+.profile-info-item {
+    display: flex;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.profile-info-label {
+    font-weight: 600;
+    width: 150px;
+}
+
+.profile-info-value {
+    flex: 1;
+}
+
+/* User Avatar Styles */
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+    margin-right: 15px;
+}
+
+.user-avatar-large {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 28px;
+    margin-right: 20px;
+}
+
+/* User Card Styles */
+.user-card .card-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.user-info h3 {
+    margin: 0;
+    color: var(--text-color);
+}
+
+.user-email {
+    color: #666;
+    font-size: 14px;
+    margin: 0;
+}
+
+.user-role {
+    color: var(--primary-color);
+    font-weight: 500;
+    margin: 5px 0 0 0;
+}
+
+/* Status Styles */
+.status {
+    padding: 4px 8px;
+    border-radius: var(--border-radius);
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.status.active {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status.inactive {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Users Stats */
+.users-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+/* Loans Stats */
+.loans-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    text-align: center;
+}
+
+.stat-card h3 {
+    margin: 0 0 10px 0;
+    color: var(--text-color);
+    font-size: 16px;
+}
+
+.stat-number {
+    font-size: 32px;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin: 0;
+}
+
+/* User Details Page */
+.user-details {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    overflow: hidden;
+}
+
+.user-details-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 30px;
+    display: flex;
+    align-items: center;
+}
+
+.user-details-info h2 {
+    margin: 0 0 5px 0;
+}
+
+.user-details-info .user-email {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.user-details-info .user-role {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+}
+
+.user-details-content {
+    padding: 30px;
+}
+
+.detail-section {
+    margin-bottom: 30px;
+}
+
+.detail-section:last-child {
+    margin-bottom: 0;
+}
+
+.detail-section h3 {
+    margin: 0 0 15px 0;
+    color: var(--text-color);
+    font-size: 18px;
+    border-bottom: 2px solid var(--light-color);
+    padding-bottom: 10px;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.detail-item {
+    padding: 10px;
+    background: var(--light-color);
+    border-radius: var(--border-radius);
+}
+
+.detail-item strong {
+    color: var(--text-color);
+}
+
+.user-details-actions {
+    padding: 20px 30px;
+    background: var(--light-color);
+    display: flex;
+    gap: 15px;
+}
+
+/* Checkbox Groups */
+.checkbox-group {
+    display: flex;
+    align-items: center;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin-bottom: 0;
+}
+
+.checkbox-group input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.2);
+}
+
+/* Admin Required Navigation */
+.admin-required {
+    display: none;
+}
+
+.admin-required.show {
+    display: block;
+}
+
+/* Users Page Specific */
+.users-page .users-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.users-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* Search Section for Users */
+.search-section {
+    background: white;
+    padding: 20px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    margin-bottom: 20px;
+}
+
+.search-form .form-row {
+    display: flex;
+    gap: 15px;
+    align-items: end;
+}
+
+.search-form .form-group {
+    flex: 1;
+}
+
+.search-form .form-group:last-child {
+    flex: 0 0 auto;
+}
+
+/* Enhanced Button Styles for Users */
+.btn-edit {
+    background-color: var(--warning-color);
+    color: white;
+}
+
+.btn-edit:hover {
+    background-color: #e67e22;
+}
+
+.btn-danger {
+    background-color: var(--error-color);
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #c0392b;
+}
+
+.btn-secondary {
+    background-color: #95a5a6;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #7f8c8d;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.form-actions .btn {
+    flex: 1;
+}
+
+/* Responsive Design for Users Management */
+@media (max-width: 768px) {
+    .users-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+    
+    .users-actions {
+        justify-content: center;
+    }
+    
+    .user-details-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .user-details-header .user-avatar-large {
+        margin: 0 0 15px 0;
+    }
+    
+    .search-form .form-row {
+        flex-direction: column;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .users-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =================== MY LOANS (USER) STYLES =================== */
+
+/* My Loans Page */
+.my-loans-page {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.my-loans-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.my-loans-header h2 {
+    color: var(--text-color);
+    margin-bottom: 10px;
+}
+
+.my-loans-header p {
+    color: #666;
+    font-size: 16px;
+}
+
+.my-loans-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+/* User Loan Cards */
+.user-loan-card {
+    border-left: 4px solid var(--primary-color);
+}
+
+.user-loan-card.overdue {
+    border-left-color: var(--error-color);
+}
+
+.user-loan-card .book-title {
+    color: var(--primary-color);
+    margin: 0 0 10px 0;
+    font-size: 18px;
+}
+
+.due-info {
+    margin: 10px 0 0 0;
+    padding: 8px 12px;
+    border-radius: var(--border-radius);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.due-info.warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.due-info.overdue {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* No Loans Message */
+.no-loans-message {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+}
+
+.no-loans-message h3 {
+    margin: 0 0 15px 0;
+    color: var(--text-color);
+}
+
+/* Profile Loans Section */
+.profile-loans-section {
+    margin: 30px 0;
+    padding: 25px;
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+.profile-loans-section h3 {
+    margin: 0 0 20px 0;
+    color: var(--text-color);
+    border-bottom: 2px solid var(--light-color);
+    padding-bottom: 10px;
+}
+
+.profile-loans-section h4 {
+    margin: 0 0 15px 0;
+    color: var(--text-color);
+    font-size: 16px;
+}
+
+.profile-loans-section .loans-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.profile-loans-section .stat-card {
+    padding: 15px;
+    text-align: center;
+}
+
+.profile-loans-section .stat-card h4 {
+    font-size: 14px;
+    margin: 0 0 8px 0;
+    color: #666;
+}
+
+.profile-loans-section .stat-number {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin: 0;
+}
+
+.profile-loans-section .stat-warning {
+    color: var(--error-color);
+}
+
+/* Recent Loans */
+.recent-loans {
+    margin-bottom: 20px;
+}
+
+.recent-loan-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background: var(--light-color);
+    border-radius: var(--border-radius);
+    margin-bottom: 10px;
+}
+
+.recent-loan-item:last-child {
+    margin-bottom: 0;
+}
+
+.loan-book-info {
+    flex: 1;
+}
+
+.loan-book-info strong {
+    display: block;
+    color: var(--text-color);
+    margin-bottom: 4px;
+}
+
+.loan-author {
+    color: #666;
+    font-size: 14px;
+}
+
+.loan-status-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.loan-date {
+    font-size: 12px;
+    color: #999;
+}
+
+.profile-loans-actions {
+    text-align: center;
+}
+
+/* Enhanced Loan Status Styles */
+.status.overdue {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.status.returned {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+/* Alert Styles for Loan Details */
+.alert {
+    padding: 15px 20px;
+    margin: 20px 0;
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+}
+
+.alert i {
+    font-size: 18px;
+}
+
+/* Responsive Design for My Loans */
+@media (max-width: 768px) {
+    .my-loans-header {
+        text-align: left;
+    }
+    
+    .my-loans-actions {
+        justify-content: flex-start;
+    }
+    
+    .user-loan-card .loan-status-info {
+        align-items: flex-start;
+    }
+    
+    .recent-loan-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .loan-status-info {
+        align-items: flex-start !important;
+        flex-direction: row !important;
+        gap: 15px !important;
+    }
+    
+    .profile-loans-section .loans-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Responsive Design for Loans Stats */
+@media (max-width: 768px) {
+    .loans-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .loans-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =================== DASHBOARD STYLES =================== */
+
+.dashboard-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.dashboard-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.dashboard-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+}
+
+.dashboard-section {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-section:last-child {
+    grid-column: 1 / -1;
+}
+
+.dashboard-section h3 {
+    margin-bottom: 20px;
+    color: var(--primary-color);
+    font-size: 1.2em;
+}
+
+.stats-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.stats-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.stats-item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.stats-item-info strong {
+    font-weight: 600;
+    color: #333;
+}
+
+.stats-item-info span {
+    font-size: 0.9em;
+    color: #666;
+}
+
+.stats-badge {
+    background: var(--primary-color);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: 500;
+}
+
+.monthly-chart {
+    display: flex;
+    align-items: end;
+    gap: 20px;
+    height: 200px;
+    padding: 20px 0;
+}
+
+.chart-bar {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+}
+
+.bar {
+    width: 40px;
+    background: linear-gradient(to top, var(--primary-color), #4CAF50);
+    border-radius: 4px 4px 0 0;
+    min-height: 10px;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+}
+
+.bar:hover {
+    transform: scaleY(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.bar-label {
+    font-size: 0.85em;
+    color: #666;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.bar-value {
+    font-weight: 600;
+    color: var(--primary-color);
+    font-size: 0.9em;
+}
+
+.no-data {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 20px;
+}
+
+/* Responsive dashboard */
+@media (max-width: 768px) {
+    .dashboard-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .dashboard-section:last-child {
+        grid-column: 1;
+    }
+    
+    .monthly-chart {
+        gap: 10px;
+    }
+    
+    .bar {
+        width: 30px;
+    }
+    
+    .dashboard-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =================== CATEGORIES STYLES =================== */
+
+.categories-page {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.categories-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.categories-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.categories-list {
+    display: grid;
+    gap: 20px;
+}
+
+.category-card {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.category-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.category-info {
+    flex: 1;
+}
+
+.category-info h3 {
+    margin: 0 0 8px 0;
+    color: var(--primary-color);
+    font-size: 1.3em;
+}
+
+.category-description {
+    color: #666;
+    margin: 0 0 12px 0;
+    font-style: italic;
+}
+
+.category-meta {
+    display: flex;
+    gap: 20px;
+    font-size: 0.9em;
+    color: #888;
+}
+
+.category-books {
+    font-weight: 500;
+    color: var(--primary-color);
+}
+
+.category-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-icon {
+    background: none;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 16px;
+}
+
+.btn-icon:hover {
+    background: #f5f5f5;
+    transform: scale(1.1);
+}
+
+.btn-icon.btn-danger:hover {
+    background: #ffebee;
+    border-color: #f44336;
+    color: #f44336;
+}
+
+.no-categories {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 40px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+/* Responsive categories */
+@media (max-width: 768px) {
+    .categories-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+    
+    .category-card {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+    
+    .category-actions {
+        justify-content: center;
+    }
+    
+    .category-meta {
+        justify-content: space-between;
+    }
+}

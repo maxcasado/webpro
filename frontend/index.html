@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Système de Gestion de Bibliothèque</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Système de Gestion de Bibliothèque</h1>
+            <nav id="main-nav">
+                <ul>
+                    <li><a href="#" class="nav-link" data-page="login">Connexion</a></li>
+                    <li><a href="#" class="nav-link" data-page="register">Inscription</a></li>
+                    <li class="auth-required hidden"><a href="#" class="nav-link" data-page="books">Livres</a></li>
+                    <li class="auth-required user-only hidden"><a href="#" class="nav-link" data-page="my-loans">Mes Emprunts</a></li>
+                    <li class="admin-required hidden"><a href="#" class="nav-link" data-page="loans">Gestion des Emprunts</a></li>
+                    <li class="admin-required hidden"><a href="#" class="nav-link" data-page="users">Gestion des Utilisateurs</a></li>
+                    <li class="admin-required hidden"><a href="#" class="nav-link" data-page="categories">Catégories</a></li>
+                    <li class="admin-required hidden"><a href="#" class="nav-link" data-page="dashboard">Tableau de Bord</a></li>
+                    <li class="auth-required hidden"><a href="#" class="nav-link" data-page="profile">Mon Profil</a></li>
+                    <li class="auth-required hidden"><a href="#" id="logout-link">Déconnexion</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main id="content">
+            <!-- Le contenu sera chargé dynamiquement ici -->
+            <div id="loading" class="hidden">
+                <div class="spinner"></div>
+                <p>Chargement en cours...</p>
+            </div>
+
+            <div id="message-container" class="hidden">
+                <div id="message" class=""></div>
+            </div>
+
+            <div id="page-content"></div>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 Système de Gestion de Bibliothèque - Développé dans le cadre du cours Architecture N-Tiers</p>
+        </footer>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
