@@ -1,11 +1,11 @@
 # Web programming project
 
-project:
-  description:
+project:  
+  description:  
     Projet de gestion de bibliothèque en ligne, développé en JavaScript (frontend) et FastAPI (backend).
     L'application permet de gérer des livres, des emprunts et des profils utilisateurs dans une interface web complète.
 
-features:
+features:  
   - Recherche de livres par titre, auteur ou description
   - Affichage des livres disponibles avec quantité restante
   - Emprunt d’un livre (décrémente la quantité)
@@ -14,23 +14,24 @@ features:
   - Gestion du profil utilisateur (modification des infos et du mot de passe)
   - Authentification sécurisée avec sessions
 
-technologies:
-  backend:
+technologies:  
+  backend:  
     - FastAPI
     - SQLAlchemy
     - Alembic
     - SQLite
     - Pydantic
     - Uvicorn
-  frontend:
+    
+  frontend:  
     - HTML
     - CSS
     - JavaScript
     - Bootstrap
     - Fetch API
 
-structure:
-  backend:
+structure:  
+  backend:  
     - main.py: Entrée principale FastAPI
     - routers/: Fichiers de routes (books, users, loans, auth)
     - models/: Modèles SQLAlchemy
@@ -38,28 +39,28 @@ structure:
     - services/: Logique métier
     - database.py: Connexion SQLite
     - requirements.txt: Dépendances Python
-  frontend:
-    - index.html: Page d'accueil
-    - js/:
+  frontend:  
+    - index.html: Page d'accueil  
+    - js/:  
         - api.js: Appels API
         - books.js: Gestion des livres
         - loans.js: Gestion des emprunts
         - profile.js: Gestion du profil
     - css/style.css: Styles personnalisés
 
-installation:
-  steps:
-    - step 1: >
+installation:  
+  steps:  
+    - step 1: >  
         Cloner le dépôt :
         git clone https://github.com/maxcasado/webpro.git && cd webpro
-    - step 2: >
+    - step 2: >  
         Backend :
         cd backend && python -m venv venv && source venv/bin/activate (ou venv\\Scripts\\activate)
         puis pip install -r requirements.txt
-    - step 3: >
+    - step 3: >  
         Lancer le backend :
         uvicorn main:app --reload
-    - step 4: >
+    - step 4: >  
         Frontend :
         cd .\frontend
         python -m server.py
@@ -78,8 +79,8 @@ todo:
   - Notifications de retards d’emprunt
   - Tests unitaires backend
   - Améliorations de sécurité (ex. rate limiting)
-  - Internationalisation FR/EN
+  - Internationalisation FR/EN  
 
-author:
-  name: Max Casado
+author:  
+  name: Max Casado & Marie Catillon  
   github: https://github.com/maxcasado
