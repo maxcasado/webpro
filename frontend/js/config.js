@@ -5,7 +5,6 @@ const CONFIG = {
 
     // Durée de vie du token en millisecondes (8 jours)
     TOKEN_EXPIRY: 8 * 24 * 60 * 60 * 1000,
-
     // Clés de stockage local
     STORAGE_KEYS: {
         TOKEN: 'auth_token',

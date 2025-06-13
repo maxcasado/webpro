@@ -15,3 +15,4 @@ api_router.include_router(users_router, prefix="/users", tags=["users"])
 api_router.include_router(loans_router, prefix="/loans", tags=["loans"])
 api_router.include_router(stats_router, prefix="/stats", tags=["stats"])
 api_router.include_router(categories_router, prefix="/categories", tags=["categories"])
+

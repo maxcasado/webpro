@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from ..repositories.books import BookRepository
 from ..models.books import Book
+from ..models.books import Book as BookModel
 from ..api.schemas.books import BookCreate, BookUpdate
 from .base import BaseService
 
@@ -57,3 +58,6 @@ class BookService(BaseService[Book, BookCreate, BookUpdate]):
             raise ValueError("La quantité ne peut pas être négative")
         
         return self.repository.update(db_obj=book, obj_in={"quantity": new_quantity})
+    
+    def search(self, query: str) -> List[BookModel]:
+        return self.repository.search(query=query)

@@ -2,14 +2,19 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from typing import List, Any, Optional
+from datetime import datetime, timedelta
 from ...utils.pagination import PaginationParams, paginate, Page
 from ...db.session import get_db
 from ...models.books import Book as BookModel
+from ...models.loans import Loan as LoanModel
 from ...models.categories import book_category
 from ..schemas.books import Book, BookCreate, BookUpdate
+
+from ..schemas.users import User  # Add this import, adjust path if needed
 from ...repositories.books import BookRepository
 from ...services.books import BookService
 from ..dependencies import get_current_active_user, get_current_admin_user
+from ..dependencies import get_current_active_user as get_current_user
 
 
 router = APIRouter()
@@ -228,3 +233,34 @@ def search_books(
     # Paginer les résultats
     params = PaginationParams(skip=skip, limit=limit, sort_by=sort_by, sort_desc=sort_desc)
     return paginate(search_query, params, BookModel)
+
+
+@router.post("/{book_id}/borrow")
+def borrow_book(book_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_active_user)):    
+    # 1. Vérifier que le livre existe
+    book = db.query(BookModel).filter(BookModel.id == book_id).first()
+    if not book:
+        raise HTTPException(status_code=404, detail="Livre non trouvé")
+
+    # 2. Vérifier la disponibilité
+    if book.quantity < 1:
+        raise HTTPException(status_code=400, detail="Ce livre n'est pas disponible")
+
+    # 3. Créer l'emprunt
+    loan = LoanModel(
+        user_id=current_user.id,
+        book_id=book.id,
+        loan_date=datetime.utcnow(),
+        due_date=datetime.utcnow() + timedelta(days=14),
+        return_date=None,
+        extended=False
+    )
+    db.add(loan)
+
+    # 4. Mettre à jour la quantité du livre
+    book.quantity -= 1
+
+    db.commit()
+    db.refresh(loan)
+
+    return {"message":"Livre emprunte avec succes"}

@@ -1,6 +1,8 @@
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func, or_
 from typing import List, Optional, Dict, Any
+from sqlalchemy import or_
+from ..models.books import Book as BookModel
 
 from .base import BaseRepository
 from ..models.books import Book
@@ -125,3 +127,14 @@ class BookRepository(BaseRepository[Book, None, None]):
         book = super().remove(id=id)
         invalidate_cache("src.repositories.books")
         return book
+    
+
+    def search(self, query: str) -> List[BookModel]:
+        return self.db.query(self.model).filter(
+            or_(
+                self.model.title.ilike(f"%{query}%"),
+                self.model.author.ilike(f"%{query}%"),
+                self.model.description.ilike(f"%{query}%"),
+                self.model.isbn.ilike(f"%{query}%")
+            )
+        ).all()

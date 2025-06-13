@@ -10,7 +10,8 @@ const UI = {
         navLinks: document.querySelectorAll('.nav-link'),
         authRequired: document.querySelectorAll('.auth-required'),
         adminRequired: document.querySelectorAll('.admin-required'),
-        logoutLink: document.getElementById('logout-link')
+        logoutLink: document.getElementById('logout-link'),
+        navMenu: document.getElementById('nav-menu')  // 👈 Assure-toi que ton HTML a cet ID
     },
 
     // Initialisation de l'interface
@@ -21,7 +22,6 @@ const UI = {
 
     // Configuration des écouteurs d'événements
     setupEventListeners: function() {
-        // Navigation - Use event delegation to handle dynamically shown elements
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('nav-link')) {
                 e.preventDefault();
@@ -32,8 +32,7 @@ const UI = {
             }
         });
 
-        // Déconnexion
-        const logoutLink = document.getElementById('logout-link');
+        const logoutLink = this.elements.logoutLink;
         if (logoutLink) {
             logoutLink.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -45,68 +44,63 @@ const UI = {
         }
     },
 
-    // Mise à jour de la navigation en fonction de l'état d'authentification
+    // Mise à jour de la navigation
     updateNavigation: function() {
         const isAuthenticated = Auth.isAuthenticated();
         const user = Auth.getUser();
         const isAdmin = user && user.is_admin;
 
-        // Re-query the DOM elements to get fresh references
         const authRequired = document.querySelectorAll('.auth-required');
         const adminRequired = document.querySelectorAll('.admin-required');
         const userOnly = document.querySelectorAll('.user-only');
 
-        authRequired.forEach((item, index) => {
-            item.classList.toggle('hidden', !isAuthenticated);
-        });
-
-        adminRequired.forEach((item, index) => {
+        authRequired.forEach(item => item.classList.toggle('hidden', !isAuthenticated));
+        adminRequired.forEach(item => {
             item.classList.toggle('hidden', !isAdmin);
-            // Force display style as backup
             item.style.display = isAdmin ? 'block' : 'none';
         });
-
-        // Hide user-only items for admins (they have their own admin panel)
         userOnly.forEach((item, index) => {
             item.classList.toggle('hidden', !isAuthenticated || isAdmin);
             item.style.display = (isAuthenticated && !isAdmin) ? 'block' : 'none';
         });
 
-        // Afficher/masquer les liens de connexion/inscription
+
         document.querySelectorAll('[data-page="login"], [data-page="register"]').forEach(link => {
             const listItem = link.parentElement;
             listItem.classList.toggle('hidden', isAuthenticated);
         });
+
+        // 🆕 Ajout de l'onglet "Mes emprunts" si utilisateur authentifié (non admin)
+        const navMenu = this.elements.navMenu;
+        if (navMenu && isAuthenticated && !isAdmin) {
+            if (!navMenu.querySelector('[data-page="my-loans"]')) {
+                const li = document.createElement('li');
+                li.innerHTML = `<a href="#" class="nav-link" data-page="my-loans">📚 Mes emprunts</a>`;
+                navMenu.appendChild(li);
+            }
+        }
     },
 
-    // Affiche un message à l'utilisateur
+    // Affiche un message
     showMessage: function(text, type = 'success') {
         this.elements.message.textContent = text;
         this.elements.message.className = type;
         this.elements.messageContainer.classList.remove('hidden');
-
-        // Masquer le message après 5 secondes
-        setTimeout(() => {
-            this.hideMessage();
-        }, 5000);
+        setTimeout(() => this.hideMessage(), 5000);
     },
 
-    // Masque le message
     hideMessage: function() {
         this.elements.messageContainer.classList.add('hidden');
     },
 
-    // Affiche l'indicateur de chargement
     showLoading: function() {
         this.elements.loading.classList.remove('hidden');
     },
 
-    // Masque l'indicateur de chargement
     hideLoading: function() {
         this.elements.loading.classList.add('hidden');
     },
 
-    // Charge le contenu HTML dans la page
     setContent: function(html) {
         this.elements.pageContent.innerHTML = html;
     }

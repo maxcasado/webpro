@@ -34,7 +34,8 @@ class LoanInDBBase(LoanBase):
 
 
 class Loan(LoanInDBBase):
-    pass
+    user: Optional[User]
+    book: Optional[Book]
 
 
 class LoanWithDetails(Loan):

@@ -390,20 +390,13 @@ const Api = {
 
     // Get current user's own loans
     getMyLoans: async function() {
-        console.log('Fetching current user loans...');
-        try {
-            const user = Auth.getUser();
-            if (!user || !user.id) {
-                throw new Error('User not authenticated');
-            }
-            const result = await this.call(`/loans/user/${user.id}`);
-            console.log('My loans fetched successfully:', result);
-            return result;
-        } catch (error) {
-            console.error('Error fetching my loans:', error);
-            throw error;
+        const user = Auth.getUser();
+        if (!user || !user.id) {
+            throw new Error('Utilisateur non authentifié');
         }
+        return this.call(`/loans/user/${user.id}`);
     },
+
 
     // Get current user's active loans
     getMyActiveLoans: async function() {
@@ -480,21 +473,30 @@ const Api = {
         }
     },
 
-    // Extend a loan (admin only)
-    extendLoan: async function(id, days) {
-        console.log(`Extending loan ${id} by ${days} days`);
+    extendLoan: async function(loanId) {
         try {
-            const queryParams = new URLSearchParams({
-                extension_days: days
+            const response = await fetch(`/api/loans/${loanId}/extend`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                }
             });
-            const result = await this.call(`/loans/${id}/extend?${queryParams.toString()}`, 'POST');
-            console.log('Loan extended successfully:', result);
-            return result;
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || "Erreur lors de la prolongation de l'emprunt");
+            }
+
+            alert("Emprunt prolongé de 21 jours !");
+            // Recharger la liste après prolongation
+            App.loadUserLoans();
         } catch (error) {
-            console.error('Loan extension failed:', error);
-            throw error;
+            console.error("Erreur lors de la prolongation :", error);
+            alert("Impossible de prolonger l'emprunt : " + error.message);
         }
     },
+
 
     // Get loans by user ID (admin only)
     getLoansByUser: async function(userId) {
@@ -715,5 +717,9 @@ const Api = {
             console.error('Error fetching category by name:', error);
             throw error;
         }
+    },
+
+    borrowBook: async function(bookId) {
+        return this.call(`/books/${bookId}/borrow`, 'POST');
     }
 };

@@ -30,22 +30,26 @@ const App = {
 
     // Charge une page spécifique
     loadPage: function(page) {
-        // Vérifier si la page nécessite une authentification
-        const authRequiredPages = ['books', 'profile', 'users', 'loans', 'my-loans'];
-        if (authRequiredPages.includes(page) && !Auth.isAuthenticated()) {
+        const authRequiredPages = ['books', 'profile', 'users', 'loans', 'my-loans', 'categories'];
+        const adminRequiredPages = ['users', 'loans', 'categories'];
+
+        const user = Auth.getUser();
+        const isAuthenticated = Auth.isAuthenticated();
+        const isAdmin = user && user.is_admin;
+
+        // Redirection si l'utilisateur n'est pas connecté
+        if (authRequiredPages.includes(page) && !isAuthenticated) {
             UI.showMessage('Vous devez être connecté pour accéder à cette page', 'error');
             page = 'login';
         }
 
-        // Vérifier si la page nécessite des droits d'admin
-        const adminRequiredPages = ['users', 'loans', 'categories'];
-        const user = Auth.getUser();
-        if (adminRequiredPages.includes(page) && (!user || !user.is_admin)) {
+        // Redirection si l'utilisateur n'est pas admin pour une page admin
+        if (adminRequiredPages.includes(page) && !isAdmin) {
             UI.showMessage('Accès non autorisé. Droits d\'administrateur requis.', 'error');
             page = 'books';
         }
 
-        // Charger le contenu de la page
+        // Chargement de la page demandée
         switch (page) {
             case 'login':
                 this.loadLoginPage();
@@ -76,13 +80,15 @@ const App = {
                 break;
             default:
                 this.loadLoginPage();
+                break;
         }
 
-        // Mettre à jour la navigation active
+        // Mise à jour du lien de navigation actif
         document.querySelectorAll('.nav-link').forEach(link => {
             link.classList.toggle('active', link.getAttribute('data-page') === page);
         });
     },
+
 
     // Charge la page de connexion
     loadLoginPage: function() {
@@ -310,12 +316,27 @@ const App = {
                     ${isAdmin ? `
                         <button class="btn btn-edit" onclick="App.editBook(${book.id})">Modifier</button>
                         <button class="btn btn-danger" onclick="App.deleteBook(${book.id})">Supprimer</button>
-                    ` : ''}
+                    ` : `
+                        ${book.quantity > 0 ? `<button class="btn btn-primary" onclick="App.borrowBook(${book.id})">Emprunter</button>` 
+                        : `<button class="btn btn-disabled" disabled>Indisponible</button>`}
+                    `}
                 </div>
             </div>
         `;
     },
 
+    borrowBook: async function(bookId) {
+        try {
+            await Api.borrowBook(bookId);
+            UI.showMessage('Livre emprunté avec succès', 'success');
+            this.loadPage('my-loans');
+        } catch (error) {
+            console.error('Erreur lors de l\'emprunt du livre:', error);
+            UI.showMessage(error.message, 'error');
+        }
+    },
+
+    
     // Setup event listeners for books page
     setupBooksEventListeners: function(isAdmin) {
         // Add book button
@@ -824,6 +845,17 @@ const App = {
                         <label for="address">Adresse</label>
                         <textarea id="address" class="form-control">${user.address || ''}</textarea>
                     </div>
+
+                    <h3 class="mt-30">Changer le mot de passe</h3>
+                    <div class="form-group">
+                        <label for="new_password">Nouveau mot de passe</label>
+                        <input type="password" id="new_password" class="form-control" minlength="8">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm_password">Confirmer le mot de passe</label>
+                        <input type="password" id="confirm_password" class="form-control" minlength="8">
+                    </div>
+
                     <button type="submit" class="btn btn-block">Enregistrer les modifications</button>
                 </form>
                 <button class="btn btn-block mt-20" onclick="App.loadPage('profile')">Annuler</button>
@@ -832,29 +864,47 @@ const App = {
 
         UI.setContent(html);
 
-        // Configurer le formulaire de modification du profil
         document.getElementById('edit-profile-form').addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const fullName = document.getElementById('full_name').value;
             const phone = document.getElementById('phone').value;
             const address = document.getElementById('address').value;
+            const newPassword = document.getElementById('new_password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+
+            if (newPassword || confirmPassword) {
+                if (newPassword.length < 8) {
+                    UI.showMessage('Le mot de passe doit contenir au moins 8 caractères', 'error');
+                    return;
+                }
+                if (newPassword !== confirmPassword) {
+                    UI.showMessage('Les mots de passe ne correspondent pas', 'error');
+                    return;
+                }
+            }
+
+            const userData = {
+                full_name: fullName,
+                phone: phone || null,
+                address: address || null
+            };
+
+            if (newPassword) {
+                userData.password = newPassword;
+            }
 
             try {
-                const userData = {
-                    full_name: fullName,
-                    phone: phone || null,
-                    address: address || null
-                };
-
                 await Api.updateCurrentUser(userData);
                 UI.showMessage('Profil mis à jour avec succès', 'success');
                 this.loadPage('profile');
             } catch (error) {
                 console.error('Erreur lors de la mise à jour du profil:', error);
+                UI.showMessage(error.message || 'Erreur lors de la mise à jour du profil', 'error');
             }
         });
     },
+
 
     // =================== USERS MANAGEMENT (ADMIN ONLY) ===================
 
@@ -1432,7 +1482,6 @@ const App = {
         }
     },
 
-    // Create a loan card HTML
     createLoanCard: function(loan) {
         const isOverdue = loan.due_date && new Date(loan.due_date) < new Date() && !loan.return_date;
         const isActive = !loan.return_date;
@@ -1450,6 +1499,7 @@ const App = {
                 <div class="card-body">
                     <div class="loan-info">
                         <p><strong>Livre:</strong> ${loan.book?.title || 'N/A'}</p>
+                        <p><strong>Auteur:</strong> ${loan.book?.author || 'N/A'}</p>
                         <p><strong>Emprunteur:</strong> ${loan.user?.full_name || 'N/A'}</p>
                         <p><strong>Email:</strong> ${loan.user?.email || 'N/A'}</p>
                         <p><strong>Date d'emprunt:</strong> ${new Date(loan.loan_date).toLocaleDateString()}</p>
@@ -1461,12 +1511,35 @@ const App = {
                     <button class="btn" onclick="App.viewLoanDetails(${loan.id})">Voir détails</button>
                     ${isActive ? `
                         <button class="btn btn-success" onclick="App.returnLoan(${loan.id})">Marquer retourné</button>
-                        <button class="btn btn-warning" onclick="App.extendLoan(${loan.id})">Prolonger</button>
+                        <button class="btn btn-warning" onclick="Api.extendLoan(${loan.id})">Prolonger</button>
                     ` : ''}
                 </div>
             </div>
         `;
     },
+
+
+    extendLoan: async function(loanId) {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`/api/loans/${loanId}/extend`, {
+                method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) throw new Error("Erreur lors de la prolongation de l'emprunt");
+
+            alert("Emprunt prolongé de 21 jours !");
+            location.reload();
+        } catch (error) {
+            console.error(error);
+            alert("Erreur lors de la prolongation.");
+        }
+    },
+
 
     // Setup event listeners for loans page
     setupLoansEventListeners: function() {
@@ -1857,98 +1930,58 @@ const App = {
     // Charge la page des emprunts de l'utilisateur connecté
     loadMyLoansPage: async function() {
         UI.showLoading();
-
         try {
-            const [myLoans, myActiveLoans, myOverdueLoans] = await Promise.all([
-                Api.getMyLoans(),
-                Api.getMyActiveLoans(),
-                Api.getMyOverdueLoans()
-            ]);
+            const loans = await Api.getMyLoans();
 
-            const user = Auth.getUser();
-            const currentDate = new Date();
-
-            let html = `
-                <div class="my-loans-page">
-                                                         <div class="my-loans-header">
-                        <h2 class="mb-20">Mes Emprunts</h2>
-                        <p class="mb-20">Gérez vos emprunts de livres</p>
-                    </div>
-                    
-                    <div class="loans-stats mb-20">
-                        <div class="stat-card">
-                            <h3>Total Emprunts</h3>
-                            <p class="stat-number">${myLoans.length}</p>
-                        </div>
-                        <div class="stat-card">
-                            <h3>Emprunts Actifs</h3>
-                            <p class="stat-number">${myActiveLoans.length}</p>
-                        </div>
-                        <div class="stat-card">
-                            <h3>En Retard</h3>
-                            <p class="stat-number stat-warning">${myOverdueLoans.length}</p>
-                        </div>
-                        <div class="stat-card">
-                            <h3>Retournés</h3>
-                            <p class="stat-number">${myLoans.filter(l => l.return_date).length}</p>
-                        </div>
-                    </div>
-
-                    <div class="search-section" id="my-loan-search-section" style="display: none;">
-                        <div class="search-form">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <select id="search-my-loan-filter" class="form-control">
-                                        <option value="all">Tous mes emprunts</option>
-                                        <option value="active">Emprunts actifs</option>
-                                        <option value="overdue">Emprunts en retard</option>
-                                        <option value="returned">Emprunts retournés</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <button class="btn" id="perform-my-loan-search-btn">Filtrer</button>
-                                    <button class="btn" id="clear-my-loan-search-btn">Tout afficher</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="my-loans-actions mb-20">
-                        <button class="btn" id="search-my-loans-btn">Filtrer mes emprunts</button>
-                    </div>
-                    
-                    <div class="card-container" id="my-loans-container">
-            `;
-
-            if (myLoans.length === 0) {
-                html += `
-                    <div class="no-loans-message">
-                        <i class="fas fa-book-open fa-3x mb-20" style="color: #ccc;"></i>
-                        <h3>Aucun emprunt trouvé</h3>
-                        <p>Vous n'avez pas encore emprunté de livres.</p>
-                        <button class="btn mt-20" onclick="App.loadPage('books')">Parcourir les livres</button>
-                    </div>
-                `;
-            } else {
-                myLoans.forEach(loan => {
-                    html += this.createUserLoanCard(loan);
-                });
+            if (!loans || loans.length === 0) {
+                UI.setContent('<h2>Mes emprunts</h2><p>Aucun emprunt en cours.</p>');
+                UI.hideLoading();
+                return;
             }
 
-            html += `</div></div>`;
+            let html = `
+                <h2>Mes emprunts</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Livre</th>
+                            <th>Date d'emprunt</th>
+                            <th>Date de retour prévue</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
 
+            for (const loan of loans) {
+                const loanDate = new Date(loan.loan_date).toLocaleDateString();
+                const dueDate = new Date(loan.due_date).toLocaleDateString();
+                const status = loan.return_date
+                    ? `Retourné le ${new Date(loan.return_date).toLocaleDateString()}`
+                    : "En cours";
+
+                html += `
+                    <tr>
+                        <td>${loan.book?.title || '(Titre inconnu)'}</td>
+                        <td>${loanDate}</td>
+                        <td>${dueDate}</td>
+                        <td>${status}</td>
+                    </tr>
+                `;
+            }
+
+            html += '</tbody></table>';
             UI.setContent(html);
-            UI.hideLoading();
-            
-            // Setup event listeners
-            this.setupMyLoansEventListeners();
-            
         } catch (error) {
-            console.error('Erreur lors du chargement de mes emprunts:', error);
+            console.error('Erreur lors du chargement de vos emprunts :', error);
+            UI.setContent('<h2>Mes emprunts</h2><p class="error">Erreur lors du chargement de vos emprunts.</p>');
+        } finally {
             UI.hideLoading();
-            UI.setContent(`<p>Erreur lors du chargement de vos emprunts. Veuillez réessayer.</p>`);
         }
     },
+
+
+
 
     // Create a user loan card HTML (simplified version for users)
     createUserLoanCard: function(loan) {
@@ -2506,6 +2539,58 @@ const App = {
             UI.showMessage(error.message || 'Erreur lors de la suppression de la catégorie', 'error');
         }
     },
+
+    loadMyLoansPage: async function() {
+        try {
+            UI.showLoading();
+            const loans = await Api.getMyLoans();
+
+            let html = `
+                <h2> Mes emprunts</h2>
+                ${loans.length === 0 ? '<p>Aucun emprunt trouvé.</p>' : '<ul class="loan-list"></ul>'}
+            `;
+
+            if (loans.length > 0) {
+                html = `
+                    <h2> Mes emprunts</h2>
+                    <table class="loan-table">
+                        <thead>
+                            <tr>
+                                <th>Titre</th>
+                                <th>Auteur</th>
+                                <th>Date d'emprunt</th>
+                                <th>Date de retour prévue</th>
+                                <th>Retourné</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${loans.map(loan => `
+                                <tr>
+                                    <td>${loan.book.title}</td>
+                                    <td>${loan.book.author}</td>
+                                    <td>${new Date(loan.loan_date).toLocaleDateString()}</td>
+                                    <td>${new Date(loan.due_date).toLocaleDateString()}</td>
+                                    <td>${loan.return_date ? new Date(loan.return_date).toLocaleDateString() : '❌'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            }
+
+            UI.setContent(html);
+        } catch (error) {
+            UI.showMessage("Erreur lors du chargement de vos emprunts", "error");
+            console.error(error);
+        } finally {
+            UI.hideLoading();
+        }
+    }
+
+
+
+
+
 };
 
 // Initialiser l'application au chargement de la page

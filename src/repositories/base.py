@@ -38,6 +38,7 @@ class BaseRepository(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         Crée un nouvel objet.
         """
         obj_in_data = jsonable_encoder(obj_in)
+        obj_in_data.pop("category_ids", None)
         db_obj = self.model(**obj_in_data)
         self.db.add(db_obj)
         self.db.commit()

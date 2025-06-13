@@ -123,30 +123,25 @@ def return_loan(
         )
 
 
-@router.post("/{id}/extend", response_model=Loan)
-def extend_loan(
-    *,
-    db: Session = Depends(get_db),
-    id: int,
-    extension_days: int = 7,
-    current_user = Depends(get_current_admin_user)
-) -> Any:
-    """
-    Prolonge la durée d'un emprunt.
-    """
-    loan_repository = LoanRepository(LoanModel, db)
-    book_repository = BookRepository(BookModel, db)
-    user_repository = UserRepository(UserModel, db)
-    service = LoanService(loan_repository, book_repository, user_repository)
-    
-    try:
-        loan = service.extend_loan(loan_id=id, extension_days=extension_days)
-        return loan
-    except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
+@router.post("/{loan_id}/extend")
+def extend_loan(loan_id: int, db: Session = Depends(get_db)):
+    service = LoanService(LoanRepository(LoanModel, db))
+    loan = service.get(id=loan_id)
+
+    if loan is None:
+        raise HTTPException(status_code=404, detail="Emprunt introuvable")
+
+    if loan.extended:
+        raise HTTPException(status_code=400, detail="L'emprunt a déjà été prolongé")
+
+    loan.due_date += timedelta(days=21)
+    loan.extended = True
+
+    db.commit()
+    db.refresh(loan)
+
+    return loan
+
 
 
 @router.get("/active/", response_model=List[Loan])
@@ -190,10 +185,6 @@ def read_user_loans(
     user_id: int,
     current_user = Depends(get_current_active_user)
 ) -> Any:
-    """
-    Récupère les emprunts d'un utilisateur.
-    """
-    # Vérifier que l'utilisateur est l'emprunteur ou un administrateur
     if not current_user.is_admin and current_user.id != user_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -226,3 +217,29 @@ def read_book_loans(
     
     loans = service.get_loans_by_book(book_id=book_id)
     return loans
+
+@router.post("/{book_id}/borrow", status_code=status.HTTP_200_OK)
+def borrow_book(
+    *,
+    db: Session = Depends(get_db),
+    book_id: int,
+    current_user = Depends(get_current_active_user)
+):
+    """
+    Permet à un utilisateur connecté d'emprunter un livre (si disponible).
+    """
+    loan_repository = LoanRepository(LoanModel, db)
+    book_repository = BookRepository(BookModel, db)
+    user_repository = UserRepository(UserModel, db)
+    service = LoanService(loan_repository, book_repository, user_repository)
+
+    # Crée un emprunt via le service, gère les exceptions
+    try:
+        loan = service.create_loan(
+            user_id=current_user.id,
+            book_id=book_id,
+            loan_period_days=14
+        )
+        return {"message": "Livre emprunté avec succès"}
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))

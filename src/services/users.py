@@ -39,26 +39,15 @@ class UserService(BaseService[User, UserCreate, UserUpdate]):
         
         return self.repository.create(obj_in=user_data)
     
-    def update(
-        self,
-        *,
-        db_obj: User,
-        obj_in: Union[UserUpdate, Dict[str, Any]]
-    ) -> User:
-        """
-        Met à jour un utilisateur, en hashant le nouveau mot de passe si fourni.
-        """
-        if isinstance(obj_in, dict):
-            update_data = obj_in
-        else:
-            update_data = obj_in.dict(exclude_unset=True)
-        
-        if "password" in update_data and update_data["password"]:
-            hashed_password = get_password_hash(update_data["password"])
-            update_data["hashed_password"] = hashed_password
-            del update_data["password"]
-        
+    def update(self, db_obj: User, obj_in: Union[UserUpdate, Dict[str, Any]]) -> User:
+        update_data = obj_in.dict(exclude_unset=True)
+
+        if "password" in update_data:
+            hashed_pw = get_password_hash(update_data.pop("password"))
+            update_data["hashed_password"] = hashed_pw
+
         return super().update(db_obj=db_obj, obj_in=update_data)
+
     
     def authenticate(self, *, email: str, password: str) -> Optional[User]:
         """
