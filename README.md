@@ -1,7 +1,7 @@
 # Web programming project
-administrator access : 
-  login:admin@biblio.fr
-  password:admin123
+administrator access:   
+  login:admin@biblio.fr  
+  password:admin123  
 project:  
   description:  
     Projet de gestion de bibliothèque en ligne, développé en JavaScript (frontend) et FastAPI (backend).  
