@@ -28,3 +28,29 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 @app.get("/")
 def read_root():
     return {"message": "Welcome to the Library Management System API"}
+
+
+from sqlalchemy.orm import Session
+from src.db.session import SessionLocal
+from src.models import User
+from passlib.hash import bcrypt
+
+def create_admin_if_not_exists():
+    db: Session = SessionLocal()
+    admin_email = "admin@biblio.fr"
+
+    existing_admin = db.query(User).filter(User.email == admin_email).first()
+    if not existing_admin:
+        admin = User(
+            full_name="Admin Root",
+            email=admin_email,
+            hashed_password=bcrypt.hash("admin123"),
+            is_admin=True
+        )
+        db.add(admin)
+        db.commit()
+        print("✅ Admin créé : admin@biblio.fr / admin123")
+    else:
+        print("ℹ️ Admin déjà présent")
+
+create_admin_if_not_exists()

@@ -122,20 +122,26 @@ const Api = {
     },
 
     getCurrentUser: async function() {
-        try {
-            const userData = await this.call('/users/me');
-            console.log('User data retrieved:', userData);
-            Auth.setUser(userData);
-            
-            // Update navigation after setting user data
-            UI.updateNavigation();
-            
-            return userData;
-        } catch (error) {
-            Auth.logout();
-            throw error;
+        const token = Auth.getToken(); // ou localStorage.getItem(CONFIG.STORAGE_KEYS.TOKEN);
+
+        const res = await fetch(`${CONFIG.API_URL}/auth/me`, {
+            headers: {
+                "Authorization": "Bearer " + token
+            }
+        });
+
+        if (!res.ok) {
+            throw new Error("Utilisateur non connecté");
         }
+
+        const user = await res.json();
+        Auth.setUser(user);
+        UI.updateNavigation();
+        return user;
     },
+
+
+
 
     getBooks: async function(skip = 0, limit = 100) {
         console.log('Fetching books with pagination...');
